@@ -11,7 +11,7 @@ CHANNELS = 1
 RATE = 16000
 p = pyaudio.PyAudio()
 
-def record_audio():
+def record_audio(duration):
     stream = p.open(
         format=FORMAT,
         channels=CHANNELS,
@@ -21,8 +21,7 @@ def record_audio():
     )
 
     frames = []
-    seconds = 1
-    for _ in range(0, int(RATE / FRAMES_PER_BUFFER * seconds)):
+    for _ in range(0, int(RATE / FRAMES_PER_BUFFER * duration)):
         data = stream.read(FRAMES_PER_BUFFER)
         frames.append(data)
 
@@ -36,14 +35,17 @@ def terminate():
 
 def record_and_move(model, t):
     while True:
-        audio = record_audio()
+        print("Speak")
+        audio = record_audio(1)  # Record for 3 seconds
         predicted_label = predict(model, audio)
         predicted_command = decode_prediction(predicted_label, LABEL_NAMES)
         print(f"Predicted command: {predicted_command}")
         
         if not move_turtle(t, predicted_command):
             break
-        time.sleep(0.5)  # Add a small delay to avoid processing too rapidly
+        
+        print("wait")
+        time.sleep(1)  # Pause for 3 seconds
 
     terminate()
 
